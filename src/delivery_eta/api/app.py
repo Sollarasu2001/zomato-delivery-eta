@@ -17,7 +17,9 @@ from delivery_eta.api.routes.health import (
 from delivery_eta.api.routes.prediction import (
     prediction_bp,
 )
-
+from delivery_eta.api.request_context import (
+    register_request_id,
+)
 
 logger = logging.getLogger(
     __name__
@@ -26,32 +28,20 @@ logger = logging.getLogger(
 
 def create_app():
     """Create and configure the Flask application."""
-    configure_logging()
-
     app = Flask(__name__)
 
-    app.config.from_object(
-        Config
-    )
+    app.config.from_object(Config)
 
-    register_error_handlers(
-        app
-    )
+    configure_logging()
+    register_request_id(app)
+    register_error_handlers(app)
 
-    app.register_blueprint(
-        health_bp
-    )
+    app.register_blueprint(health_bp)
+    app.register_blueprint(prediction_bp)
 
-    app.register_blueprint(
-        prediction_bp
-    )
-
-    logger.info(
-        "application_started"
-    )
+    logger.info("application_started")
 
     return app
-
 
 if __name__ == "__main__":
     app = create_app()

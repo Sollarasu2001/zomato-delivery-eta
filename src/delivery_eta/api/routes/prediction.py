@@ -1,9 +1,11 @@
 """Prediction routes."""
 
 import logging
+import time
 
 from flask import Blueprint
 from flask import jsonify
+from flask import g
 from flask import request
 
 from delivery_eta.api.schemas import (
@@ -12,7 +14,9 @@ from delivery_eta.api.schemas import (
 from delivery_eta.api.services.predictor import (
     DeliveryETAPredictor,
 )
-
+from delivery_eta.monitoring.events import (
+    log_prediction_event,
+)
 
 logger = logging.getLogger(
     __name__
@@ -69,9 +73,23 @@ def predict():
         payload
     )
 
+    start_time = time.perf_counter()
+
     prediction = predictor.predict(
         data
     )
+
+    latency_ms = (
+        time.perf_counter() - start_time
+    ) * 1000
+
+    log_prediction_event(
+    prediction=prediction,
+    latency_ms=latency_ms,
+    status="success",
+    model_version="polynomial_ridge",
+    request_id=g.request_id,
+)
 
     logger.info(
         "prediction_success"

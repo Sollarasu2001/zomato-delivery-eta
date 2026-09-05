@@ -212,3 +212,33 @@ def test_prediction_wrong_method(
     assert data["error"] == (
         "Method not allowed."
     )
+
+
+def test_prediction_request_id(client):
+    """Test that a request ID is returned."""
+    response = client.post(
+        "/predict",
+        json=VALID_PAYLOAD,
+    )
+
+    assert response.status_code == 200
+    assert response.headers["X-Request-ID"]
+
+
+def test_prediction_preserves_request_id(client):
+    """Test that a supplied request ID is preserved."""
+    request_id = "test-request-123"
+
+    response = client.post(
+        "/predict",
+        json=VALID_PAYLOAD,
+        headers={
+            "X-Request-ID": request_id,
+        },
+    )
+
+    assert response.status_code == 200
+    assert (
+        response.headers["X-Request-ID"]
+        == request_id
+    )
