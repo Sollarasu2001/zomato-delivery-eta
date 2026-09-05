@@ -23,6 +23,9 @@ from delivery_eta.monitoring.events import (
 from delivery_eta.monitoring.predictions import (
     prediction_metrics,
 )
+from delivery_eta.monitoring.drift import (
+    drift_monitor,
+)
 
 logger = logging.getLogger(
     __name__
@@ -80,6 +83,10 @@ def predict():
     )
 
     data_quality_metrics.record(
+        data
+    )
+
+    drift_monitor.record(
         data
     )
 

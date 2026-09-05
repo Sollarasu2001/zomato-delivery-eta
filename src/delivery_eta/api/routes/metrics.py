@@ -12,6 +12,9 @@ from delivery_eta.monitoring.metrics import (
 from delivery_eta.monitoring.predictions import (
     prediction_metrics,
 )
+from delivery_eta.monitoring.drift import (
+    drift_monitor,
+)
 
 
 metrics_bp = Blueprint(
@@ -34,6 +37,10 @@ def get_metrics():
 
     response.update(
         data_quality_metrics.snapshot()
+    )
+    
+    response.update(
+        drift_monitor.snapshot()
     )
 
     return jsonify(response)
