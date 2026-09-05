@@ -11,9 +11,8 @@ on:
       - main
       - master
 
-
 jobs:
-  test-and-build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,8 +35,3 @@ jobs:
           PYTHONPATH: src
         run: |
           pytest -v
-
-      - name: Build Docker image
-        run: |
-          docker build \
-            -t zomato-delivery-eta:${{ github.sha }} .
