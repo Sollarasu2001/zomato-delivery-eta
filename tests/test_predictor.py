@@ -51,8 +51,8 @@ from delivery_eta.api.services.predictor import (
 def test_predictor_missing_model():
     """Test missing model artifact handling."""
     predictor = DeliveryETAPredictor(
-        model_path=Path(
-            "nonexistent"
+        model_path=(
+            Path("nonexistent")
             / "model.joblib"
         )
     )
