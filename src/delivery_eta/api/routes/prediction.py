@@ -4,8 +4,8 @@ import logging
 import time
 
 from flask import Blueprint
-from flask import jsonify
 from flask import g
+from flask import jsonify
 from flask import request
 
 from delivery_eta.api.schemas import (
@@ -14,8 +14,14 @@ from delivery_eta.api.schemas import (
 from delivery_eta.api.services.predictor import (
     DeliveryETAPredictor,
 )
+from delivery_eta.monitoring.data_quality import (
+    data_quality_metrics,
+)
 from delivery_eta.monitoring.events import (
     log_prediction_event,
+)
+from delivery_eta.monitoring.predictions import (
+    prediction_metrics,
 )
 
 logger = logging.getLogger(
@@ -73,10 +79,18 @@ def predict():
         payload
     )
 
+    data_quality_metrics.record(
+        data
+    )
+
     start_time = time.perf_counter()
 
     prediction = predictor.predict(
         data
+    )
+
+    prediction_metrics.record(
+        prediction
     )
 
     latency_ms = (
@@ -84,12 +98,12 @@ def predict():
     ) * 1000
 
     log_prediction_event(
-    prediction=prediction,
-    latency_ms=latency_ms,
-    status="success",
-    model_version="polynomial_ridge",
-    request_id=g.request_id,
-)
+        prediction=prediction,
+        latency_ms=latency_ms,
+        status="success",
+        model_version="polynomial_ridge",
+        request_id=g.request_id,
+    )
 
     logger.info(
         "prediction_success"

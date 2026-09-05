@@ -17,8 +17,14 @@ from delivery_eta.api.routes.health import (
 from delivery_eta.api.routes.prediction import (
     prediction_bp,
 )
+from delivery_eta.api.routes.metrics import (
+    metrics_bp,
+)
 from delivery_eta.api.request_context import (
-    register_request_id,
+    register_request_context,
+)
+from delivery_eta.api.request_context import (
+    register_request_context,
 )
 
 logger = logging.getLogger(
@@ -33,11 +39,13 @@ def create_app():
     app.config.from_object(Config)
 
     configure_logging()
-    register_request_id(app)
+    register_request_context(app)
     register_error_handlers(app)
+    register_request_context(app)
 
     app.register_blueprint(health_bp)
     app.register_blueprint(prediction_bp)
+    app.register_blueprint(metrics_bp)
 
     logger.info("application_started")
 
